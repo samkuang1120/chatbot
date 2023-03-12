@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Messages</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script th:src="@{/js/chatbot.js}"></script>
+    <style>
+       .chat-message {
+			padding: 10px;
+			margin-bottom: 10px;
+			border-radius: 5px;
+			max-width: 80%;
+		}
+        .user-message {
+			background-color: #007bff;
+			color: white;
+			align-self: flex-end;
+			font-size: 14px;
+		}
+		.bot-message {
+			background-color: #e9ecef;
+			color: black;
+			align-self: flex-start;
+			font-size: 14px;
+		}
+		.container {
+            margin: 0 auto;
+            padding-top: 10px;
+        }
+
+        .panel-default {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .panel-heading {
+            background-color: #f0f0f0;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .panel-title {
+            font-weight: bold;
+            font-size: 20px;
+            margin: 0;
+        }
+        .panel-chat {
+            font-size: 14px;
+        }
+
+        .form-control {
+            border-radius: 0;
+        }
+
+        .btn-primary {
+            border-radius: 0;
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0062cc;
+            border-color: #005cbf;
+        }
+
+        .table {
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .table th {
+            font-weight: bold;
+            text-align: left;
+            background-color: #f0f0f0;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Chat Bot</h3>
+                </div>
+                <div class="panel-body">
+                    <form id="chat-form">
+                    <div class="form-group">
+                        <label>Message:</label>
+                        <input type="text" class="form-control" id="input-box" placeholder="Type your message here...">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send</button>
+                    </form>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Chat History</h3>
+                </div>
+                <div id="chat-history" class="panel-chat">
+                    <!-- Chat history will be displayed here -->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Message</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="chatMessage : ${chatMessages}">
+                    <td th:text="${chatMessage.timestamp}"></td>
+                    <td th:text="${chatMessage.message}"></td>
+                    <td th:text="${chatMessage.response}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
