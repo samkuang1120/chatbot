@@ -68,7 +68,7 @@
 				<configuration>
 					<repository>${project.artifactId}</repository>
 					<tag>${project.version}</tag>
-					<dockerHost>tcp://192.168.11.165:2375</dockerHost>
+					<!--<dockerHost>tcp://192.168.11.165:2375</dockerHost>-->
 				</configuration>
 			</plugin>
 

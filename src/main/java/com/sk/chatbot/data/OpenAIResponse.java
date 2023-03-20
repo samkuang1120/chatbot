@@ -1,5 +1,5 @@
 package com.sk.chatbot.data;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class OpenAIResponse {
@@ -7,19 +7,103 @@ public class OpenAIResponse {
     private String object;
     private long created;
     private String model;
-    private List<Choice> choices;
     private Usage usage;
+    private List<Choice> choices;
 
-    public OpenAIResponse() {}
+    public static class Usage {
+        @JsonProperty("prompt_tokens")
+        private int promptTokens;
 
-    public OpenAIResponse(String id, String object, long created, String model, List<Choice> choices, Usage usage) {
-        this.id = id;
-        this.object = object;
-        this.created = created;
-        this.model = model;
-        this.choices = choices;
-        this.usage = usage;
+        @JsonProperty("completion_tokens")
+        private int completionTokens;
+
+        @JsonProperty("total_tokens")
+        private int totalTokens;
+
+        // getter and setter methods
+
+        public int getPromptTokens() {
+            return promptTokens;
+        }
+
+        public void setPromptTokens(int promptTokens) {
+            this.promptTokens = promptTokens;
+        }
+
+        public int getCompletionTokens() {
+            return completionTokens;
+        }
+
+        public void setCompletionTokens(int completionTokens) {
+            this.completionTokens = completionTokens;
+        }
+
+        public int getTotalTokens() {
+            return totalTokens;
+        }
+
+        public void setTotalTokens(int totalTokens) {
+            this.totalTokens = totalTokens;
+        }
     }
+
+    public static class Choice {
+        private Message message;
+        private String finish_reason;
+        private int index;
+
+        // getter and setter methods
+
+        public Message getMessage() {
+            return message;
+        }
+
+        public void setMessage(Message message) {
+            this.message = message;
+        }
+
+        public String getFinish_reason() {
+            return finish_reason;
+        }
+
+        public void setFinish_reason(String finish_reason) {
+            this.finish_reason = finish_reason;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public void setIndex(int index) {
+            this.index = index;
+        }
+    }
+
+    public static class Message {
+        private String role;
+        private String content;
+
+        // getter and setter methods
+
+
+        public String getRole() {
+            return role;
+        }
+
+        public void setRole(String role) {
+            this.role = role;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
+    }
+
+    // getter and setter methods for all fields
 
     public String getId() {
         return id;
@@ -53,14 +137,6 @@ public class OpenAIResponse {
         this.model = model;
     }
 
-    public List<Choice> getChoices() {
-        return choices;
-    }
-
-    public void setChoices(List<Choice> choices) {
-        this.choices = choices;
-    }
-
     public Usage getUsage() {
         return usage;
     }
@@ -69,89 +145,11 @@ public class OpenAIResponse {
         this.usage = usage;
     }
 
-    public static class Choice {
-        private String text;
-        private int index;
-        private List<Double> logprobs;
-        private String finishReason;
-
-        public Choice() {}
-
-        public Choice(String text, int index, List<Double> logprobs, String finishReason) {
-            this.text = text;
-            this.index = index;
-            this.logprobs = logprobs;
-            this.finishReason = finishReason;
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public void setText(String text) {
-            this.text = text;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public void setIndex(int index) {
-            this.index = index;
-        }
-
-        public List<Double> getLogprobs() {
-            return logprobs;
-        }
-
-        public void setLogprobs(List<Double> logprobs) {
-            this.logprobs = logprobs;
-        }
-
-        public String getFinishReason() {
-            return finishReason;
-        }
-
-        public void setFinishReason(String finishReason) {
-            this.finishReason = finishReason;
-        }
+    public List<Choice> getChoices() {
+        return choices;
     }
 
-    public static class Usage {
-        private int promptTokens;
-        private int completionTokens;
-        private int totalTokens;
-
-        public Usage() {}
-
-        public Usage(int promptTokens, int completionTokens, int totalTokens) {
-            this.promptTokens = promptTokens;
-            this.completionTokens = completionTokens;
-            this.totalTokens = totalTokens;
-        }
-
-        public int getPromptTokens() {
-            return promptTokens;
-        }
-
-        public void setPromptTokens(int promptTokens) {
-            this.promptTokens = promptTokens;
-        }
-
-        public int getCompletionTokens() {
-            return completionTokens;
-        }
-
-        public void setCompletionTokens(int completionTokens) {
-            this.completionTokens = completionTokens;
-        }
-
-        public int getTotalTokens() {
-            return totalTokens;
-        }
-
-        public void setTotalTokens(int totalTokens) {
-            this.totalTokens = totalTokens;
-        }
+    public void setChoices(List<Choice> choices) {
+        this.choices = choices;
     }
 }

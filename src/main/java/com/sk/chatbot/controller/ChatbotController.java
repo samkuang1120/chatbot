@@ -1,25 +1,27 @@
 package com.sk.chatbot.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sk.chatbot.data.ChatbotResponse;
+import com.sk.chatbot.data.Message;
+import com.sk.chatbot.data.OpenAIReqMessages;
 import com.sk.chatbot.data.OpenAIResponse;
 import com.sk.chatbot.repository.ChatMessageRepository;
 import com.sk.chatbot.repository.entity.ChatMessage;
 import com.sk.chatbot.service.ChatbotService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.time.LocalDateTime;
 @RestController
 @RequestMapping("api")
 public class ChatbotController {
@@ -30,6 +32,9 @@ public class ChatbotController {
     @Value("${openai.api.url}")
     private String openaiUrl;
 
+    @Value("${openai.api.model}")
+    private String model;
+
     @Autowired
     private RestTemplate restTemplate;
     @Autowired
@@ -39,7 +44,7 @@ public class ChatbotController {
     private ChatMessageRepository chatMessageRepository;
 
     @PostMapping(value = "/chat", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> generateText(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> generateText(@RequestBody Map<String, String> request, HttpServletRequest httpReq) {
         try {
             String prompt = request.get("message");
 
@@ -47,14 +52,35 @@ public class ChatbotController {
 
             ObjectMapper mapper = new ObjectMapper();
 
-// create JSON object
-            ObjectNode requestBody = mapper.createObjectNode();
-            requestBody.put("prompt", prompt);
-            requestBody.put("temperature", 0.5); // specify other parameters as needed
-            requestBody.put("max_tokens", 3200);
+//// create JSON object
+//            ObjectNode requestBody = mapper.createObjectNode();
+//            requestBody.put("prompt", prompt);
+////            requestBody.put("temperature", 0.5); // specify other parameters as needed
+////            requestBody.put("max_tokens", 3200);
+//            requestBody.put("model", model);
+            OpenAIReqMessages reqBody = new OpenAIReqMessages(model);
+
+            List<Message> histMessages = new ArrayList<Message>();
+            Message mesg = new Message("user", prompt);
+            histMessages.add(mesg);
+
+            reqBody.setMessages(histMessages);
+
+            /*HttpSession session = httpReq.getSession();
+            List<OpenAIReqMessages.Message> histMessages = null;
+
+            if(session.getAttribute("context") != null) {
+                histMessages = (List<OpenAIReqMessages.Message>)session.getAttribute("context");
+                if(histMessages.size() > 5) {
+                    histMessages.re
+                }*/
+//            }
+
+
 
 // convert JSON object to string
-            String requestBodyString = mapper.writeValueAsString(requestBody);
+
+            String requestBodyString = mapper.writeValueAsString(reqBody);
 
             // create HTTP headers
             HttpHeaders headers = new HttpHeaders();
@@ -64,6 +90,11 @@ public class ChatbotController {
             // create HTTP entity with request body and headers
             HttpEntity<String> entity = new HttpEntity<>(requestBodyString, headers);
 
+            System.out.println("apiKey = " + apiKey);
+            System.out.println("openaiUrl = " + openaiUrl);
+            System.out.println("model = " + model);
+            System.out.println("requestBodyString = " + requestBodyString);
+
             // send API request and get response
             String url = openaiUrl;
             OpenAIResponse response = null;
@@ -71,7 +102,12 @@ public class ChatbotController {
             try{
                 response = restTemplate.postForObject(url, entity, OpenAIResponse.class);
                 if(response != null) {
-                    result.put("message", response.getChoices().get(0).getText());
+                    result.put("message", response.getChoices().get(0).getMessage().getContent());
+
+                    System.out.println("response message = " + response);
+
+                    save(prompt, response);
+
                 } else {
                     throw new Exception("connection to openai error!");
                 }
@@ -80,9 +116,6 @@ public class ChatbotController {
                 result.put("message", "System issue: " + exception);
             }
 
-            System.out.println("response message = " + response);
-
-            save(prompt, response);
             return ResponseEntity.ok().body(result);
 
         } catch (Exception e) {
@@ -94,7 +127,7 @@ public class ChatbotController {
 
     private void save(String prompt, OpenAIResponse response) {
         LocalDateTime timestamp = LocalDateTime.now();
-        ChatMessage chatMessage = new ChatMessage(prompt, response.getChoices().get(0).getText(), timestamp);
+        ChatMessage chatMessage = new ChatMessage(prompt, response.getChoices().get(0).getMessage().getContent(), timestamp);
         chatMessageRepository.save(chatMessage);
     }
 
